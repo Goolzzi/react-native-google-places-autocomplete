@@ -645,7 +645,7 @@ export default class GooglePlacesAutocomplete extends Component {
           extraData={[this.state.dataSource, this.props]}
           ItemSeparatorComponent={this._renderSeparator}
           renderItem={({ item }) => this._renderRow(item)}
-          ListFooterComponent={this.props.renderFooter}
+          ListFooterComponent={this._renderListFooter}
           {...this.props}
         />
       );
