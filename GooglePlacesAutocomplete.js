@@ -95,7 +95,7 @@ export default class GooglePlacesAutocomplete extends Component {
 
   buildRowsFromResults = (results) => {
     let res = [];
-
+    let limitRows = results.slice(0,this.props.resultsLimit);
     if (results.length === 0 || this.props.predefinedPlacesAlwaysVisible === true) {
       res = [...this.props.predefinedPlaces];
 
@@ -112,7 +112,7 @@ export default class GooglePlacesAutocomplete extends Component {
       isPredefinedPlace: true
     }));
 
-    return [...res, ...results];
+    return [...res, ...limitRows];
   }
 
   componentWillMount() {
@@ -595,25 +595,15 @@ export default class GooglePlacesAutocomplete extends Component {
 
   _onFocus = () => this.setState({ listViewDisplayed: true })
 
-  _renderPoweredLogo = () => {
-    if (!this._shouldShowPoweredLogo()) {
+  _renderListFooter = () => {
+
+    if (!this._shouldShowListFooter()) {
       return null
     }
-
-    return (
-      <View
-        style={[this.props.suppressDefaultStyles ? {} : defaultStyles.row, defaultStyles.poweredContainer, this.props.styles.poweredContainer]}
-      >
-        <Image
-          style={[this.props.suppressDefaultStyles ? {} : defaultStyles.powered, this.props.styles.powered]}
-          resizeMode={Image.resizeMode.contain}
-          source={require('./images/powered_by_google_on_white.png')}
-        />
-      </View>
-    );
+    return this.props.renderFooter();
   }
 
-  _shouldShowPoweredLogo = () => {
+  _shouldShowListFooter = () => {
     if (!this.props.enablePoweredByContainer || this.state.dataSource.length == 0) {
       return false
     }
@@ -655,7 +645,7 @@ export default class GooglePlacesAutocomplete extends Component {
           extraData={[this.state.dataSource, this.props]}
           ItemSeparatorComponent={this._renderSeparator}
           renderItem={({ item }) => this._renderRow(item)}
-          ListFooterComponent={this._renderPoweredLogo}
+          ListFooterComponent={this.props.renderFooter}
           {...this.props}
         />
       );
@@ -734,6 +724,7 @@ GooglePlacesAutocomplete.propTypes = {
   enableEmptySections: PropTypes.bool,
   renderDescription: PropTypes.func,
   renderRow: PropTypes.func,
+  renderFooter: PropTypes.func,
   renderLeftButton: PropTypes.func,
   renderRightButton: PropTypes.func,
   listUnderlayColor: PropTypes.string,
@@ -741,7 +732,8 @@ GooglePlacesAutocomplete.propTypes = {
   isRowScrollable: PropTypes.bool,
   text: PropTypes.string,
   textInputHide: PropTypes.bool,
-  suppressDefaultStyles: PropTypes.bool
+  suppressDefaultStyles: PropTypes.bool,
+  resultsLimit: PropTypes.number
 }
 GooglePlacesAutocomplete.defaultProps = {
   placeholder: 'Search',
@@ -784,7 +776,8 @@ GooglePlacesAutocomplete.defaultProps = {
   listViewDisplayed: 'auto',
   debounce: 0,
   textInputHide: false,
-  suppressDefaultStyles: false
+  suppressDefaultStyles: false,
+  resultsLimit: 5
 }
 
 // this function is still present in the library to be retrocompatible with version < 1.1.0
